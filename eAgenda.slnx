@@ -3,6 +3,6 @@
     <Project Path="src/eAgenda.Dominio/eAgenda.Dominio.csproj" />
     <Project Path="src/eAgenda.Aplicacao/eAgenda.Aplicacao.csproj" />
     <Project Path="src/eAgenda.Infra/eAgenda.Infra.csproj" />
-    <Project Path="tests/eAgenda.Testes.Unidade/eAgenda.UnitTests.csproj" />
+    <Project Path="tests/eAgenda.Testes.Unidade/eAgenda.Testes.Unidade.csproj" />
   </Folder>
 </Solution>
