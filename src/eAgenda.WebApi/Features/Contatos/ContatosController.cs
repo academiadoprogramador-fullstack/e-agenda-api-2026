@@ -8,7 +8,7 @@ namespace eAgenda.WebApi.Features.Contatos;
 public sealed class ContatosController(ServicoContato servicoContato) : ControllerBase
 {
     [HttpGet]
-    public ActionResult<List<ListarContatosDto>?> SelecionarTodos()
+    public ActionResult<List<ListarContatosDto>> SelecionarTodos()
     {
         var resultado = servicoContato.SelecionarTodos();
 
@@ -29,7 +29,7 @@ public sealed class ContatosController(ServicoContato servicoContato) : Controll
     }
 
     [HttpPost]
-    public ActionResult<CadastrarContatoResponse> Cadastrar(CadastrarContatoRequest req)
+    public ActionResult<DetalhesContatoDto> Cadastrar(CadastrarContatoRequest req)
     {
         var dto = new CadastrarContatoDto(
             req.Nome,
@@ -39,14 +39,23 @@ public sealed class ContatosController(ServicoContato servicoContato) : Controll
             req.Empresa
         );
 
-        var resultado = servicoContato.Cadastrar(dto);
+        var resultadoCadastro = servicoContato.Cadastrar(dto);
 
-        if (resultado.IsFailed)
+        if (resultadoCadastro.IsFailed)
             return BadRequest();
 
-        var res = new CadastrarContatoResponse(resultado.Value);
+        var id = resultadoCadastro.Value;
 
-        return CreatedAtAction(nameof(SelecionarPorId), new { id = resultado.Value }, req);
+        var resultadoSelecao = servicoContato.SelecionarPorId(id);
+
+        if (resultadoCadastro.IsFailed)
+            return NotFound(id);
+
+        return CreatedAtAction(
+            nameof(SelecionarPorId),
+            new { id },
+            resultadoSelecao.Value
+        );
     }
 
     [HttpPut("{id:guid}")]
@@ -66,7 +75,7 @@ public sealed class ContatosController(ServicoContato servicoContato) : Controll
         if (resultado.IsFailed)
             return NotFound(id);
 
-        return CreatedAtAction(nameof(SelecionarPorId), new { id }, req);
+        return NoContent();
     }
 
     [HttpDelete("{id:guid}")]
