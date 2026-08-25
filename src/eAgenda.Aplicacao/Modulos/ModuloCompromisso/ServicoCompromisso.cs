@@ -43,7 +43,7 @@ public class ServicoCompromisso : ServicoBase<Compromisso>
             return Result.Fail<Guid>(resultadoValidacao.Errors);
 
         if (ExisteConflitoDeHorario(novoCompromisso))
-            return Falha<Guid>(string.Empty, "Já existe um compromisso cadastrado neste intervalo de horário.");
+            return Falha<Guid>(TipoErro.Conflito, string.Empty, "Já existe um compromisso cadastrado neste intervalo de horário.");
 
         repositorioCompromisso.Cadastrar(novoCompromisso);
 
@@ -74,12 +74,12 @@ public class ServicoCompromisso : ServicoBase<Compromisso>
             return resultadoValidacao;
 
         if (ExisteConflitoDeHorario(compromissoAtualizado, dto.Id))
-            return Falha(string.Empty, "Já existe um compromisso cadastrado neste intervalo de horário.");
+            return Falha(TipoErro.Conflito, string.Empty, "Já existe um compromisso cadastrado neste intervalo de horário.");
 
         bool conseguiuEditar = repositorioCompromisso.Editar(dto.Id, compromissoAtualizado);
 
         if (!conseguiuEditar)
-            return Falha(string.Empty, "Compromisso não encontrado.");
+            return Falha(TipoErro.NaoEncontrado, string.Empty, "Compromisso não encontrado.");
 
         return Result.Ok();
     }
@@ -89,7 +89,7 @@ public class ServicoCompromisso : ServicoBase<Compromisso>
         Compromisso? compromisso = repositorioCompromisso.SelecionarPorId(id);
 
         if (compromisso == null)
-            return Falha(string.Empty, "Compromisso não encontrado.");
+            return Falha(TipoErro.NaoEncontrado, string.Empty, "Compromisso não encontrado.");
 
         repositorioCompromisso.Excluir(id);
 
@@ -120,7 +120,7 @@ public class ServicoCompromisso : ServicoBase<Compromisso>
         Compromisso? compromisso = repositorioCompromisso.SelecionarPorId(id);
 
         if (compromisso == null)
-            return Result.Fail("Compromisso não encontrado.");
+            return Falha<DetalhesCompromissoDto>(TipoErro.NaoEncontrado, string.Empty, "Compromisso não encontrado.");
 
         return Result.Ok(new DetalhesCompromissoDto(
             compromisso.Id,
@@ -152,7 +152,7 @@ public class ServicoCompromisso : ServicoBase<Compromisso>
         Contato? contato = repositorioContato.SelecionarPorId(contatoId.Value);
 
         if (contato == null)
-            return Result.Fail<Contato?>(new Error("Selecione um contato válido.").WithMetadata("Campo", nameof(CadastrarCompromissoDto.ContatoId)));
+            return Falha<Contato?>(TipoErro.Validacao, nameof(CadastrarCompromissoDto.ContatoId), "Selecione um contato válido.");
 
         return Result.Ok<Contato?>(contato);
     }

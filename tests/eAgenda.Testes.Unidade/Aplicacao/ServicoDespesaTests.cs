@@ -1,3 +1,4 @@
+using eAgenda.Aplicacao.Compartilhado;
 using eAgenda.Aplicacao.Modulos.ModuloDespesa;
 using eAgenda.Dominio.Modulos.ModuloCategoria;
 using eAgenda.Dominio.Modulos.ModuloDespesa;
@@ -40,6 +41,8 @@ public sealed class ServicoDespesaTests
         // Assert
         Assert.IsTrue(resultado.IsFailed);
         Assert.AreEqual("Selecione ao menos uma categoria.", resultado.Errors.Single().Message);
+        Assert.AreEqual(TipoErro.Validacao, resultado.Errors.Single().Metadata[nameof(TipoErro)]);
+        Assert.AreEqual(nameof(dto.CategoriaIds), resultado.Errors.Single().Metadata["Campo"]);
         repositorioDespesa.Verify(r => r.Cadastrar(It.IsAny<Despesa>()), Times.Never);
     }
 
@@ -60,6 +63,8 @@ public sealed class ServicoDespesaTests
         // Assert
         Assert.IsTrue(resultado.IsFailed);
         Assert.AreEqual("Selecione apenas categorias válidas.", resultado.Errors.Single().Message);
+        Assert.AreEqual(TipoErro.Validacao, resultado.Errors.Single().Metadata[nameof(TipoErro)]);
+        Assert.AreEqual(nameof(dto.CategoriaIds), resultado.Errors.Single().Metadata["Campo"]);
         repositorioDespesa.Verify(r => r.Cadastrar(It.IsAny<Despesa>()), Times.Never);
     }
 
@@ -105,6 +110,7 @@ public sealed class ServicoDespesaTests
         // Assert
         Assert.IsTrue(resultado.IsFailed);
         Assert.IsTrue(resultado.Errors.Any(e => e.Message.Contains("Descrição")));
+        Assert.IsTrue(resultado.Errors.All(e => Equals(TipoErro.Validacao, e.Metadata[nameof(TipoErro)])));
         repositorioDespesa.Verify(r => r.Cadastrar(It.IsAny<Despesa>()), Times.Never);
     }
 
@@ -130,6 +136,7 @@ public sealed class ServicoDespesaTests
         // Assert
         Assert.IsTrue(resultado.IsFailed);
         Assert.AreEqual("Despesa não encontrada.", resultado.Errors.Single().Message);
+        Assert.AreEqual(TipoErro.NaoEncontrado, resultado.Errors.Single().Metadata[nameof(TipoErro)]);
     }
 
     [TestMethod]
@@ -144,6 +151,7 @@ public sealed class ServicoDespesaTests
         // Assert
         Assert.IsTrue(resultado.IsFailed);
         Assert.AreEqual("Despesa não encontrada.", resultado.Errors.Single().Message);
+        Assert.AreEqual(TipoErro.NaoEncontrado, resultado.Errors.Single().Metadata[nameof(TipoErro)]);
         repositorioDespesa.Verify(r => r.Excluir(It.IsAny<Guid>()), Times.Never);
     }
 

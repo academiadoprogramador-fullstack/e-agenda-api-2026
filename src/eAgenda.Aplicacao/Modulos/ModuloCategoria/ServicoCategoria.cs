@@ -22,7 +22,7 @@ public class ServicoCategoria : ServicoBase<Categoria>
     public Result<Guid> Cadastrar(CadastrarCategoriaDto dto)
     {
         if (ExisteCategoriaComMesmoTitulo(dto.Titulo))
-            return Falha<Guid>(nameof(dto.Titulo), "Já existe uma categoria com este título.");
+            return Falha<Guid>(TipoErro.Conflito, nameof(dto.Titulo), "Já existe uma categoria com este título.");
 
         Categoria novaCategoria = new Categoria(dto.Titulo);
 
@@ -39,7 +39,7 @@ public class ServicoCategoria : ServicoBase<Categoria>
     public Result Editar(EditarCategoriaDto dto)
     {
         if (ExisteCategoriaComMesmoTitulo(dto.Titulo, dto.Id))
-            return Falha(nameof(dto.Titulo), "Já existe uma categoria com este título.");
+            return Falha(TipoErro.Conflito, nameof(dto.Titulo), "Já existe uma categoria com este título.");
 
         Categoria categoriaAtualizada = new Categoria(dto.Titulo);
 
@@ -51,7 +51,7 @@ public class ServicoCategoria : ServicoBase<Categoria>
         bool conseguiuEditar = repositorioCategoria.Editar(dto.Id, categoriaAtualizada);
 
         if (!conseguiuEditar)
-            return Falha(string.Empty, "Categoria não encontrada.");
+            return Falha(TipoErro.NaoEncontrado, string.Empty, "Categoria não encontrada.");
 
         return Result.Ok();
     }
@@ -61,10 +61,10 @@ public class ServicoCategoria : ServicoBase<Categoria>
         Categoria? categoria = repositorioCategoria.SelecionarPorId(id);
 
         if (categoria == null)
-            return Falha(string.Empty, "Categoria não encontrada.");
+            return Falha(TipoErro.NaoEncontrado, string.Empty, "Categoria não encontrada.");
 
         if (PossuiDespesasVinculadas(id))
-            return Falha(string.Empty, "Não é possível excluir esta categoria, pois ela possui despesas vinculadas.");
+            return Falha(TipoErro.Conflito, string.Empty, "Não é possível excluir esta categoria, pois ela possui despesas vinculadas.");
 
         repositorioCategoria.Excluir(id);
 
@@ -84,7 +84,7 @@ public class ServicoCategoria : ServicoBase<Categoria>
         Categoria? categoria = repositorioCategoria.SelecionarPorId(id);
 
         if (categoria == null)
-            return Result.Fail("Categoria não encontrada.");
+            return Falha<DetalhesCategoriaDto>(TipoErro.NaoEncontrado, string.Empty, "Categoria não encontrada.");
 
         return Result.Ok(new DetalhesCategoriaDto(categoria.Id, categoria.Titulo));
     }

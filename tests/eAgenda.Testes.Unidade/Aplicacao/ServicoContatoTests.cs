@@ -1,3 +1,4 @@
+using eAgenda.Aplicacao.Compartilhado;
 using eAgenda.Aplicacao.Modulos.ModuloContato;
 using eAgenda.Dominio.Modulos.ModuloCompromisso;
 using eAgenda.Dominio.Modulos.ModuloContato;
@@ -66,6 +67,7 @@ public sealed class ServicoContatoTests
         // Assert
         Assert.IsTrue(resultado.IsFailed);
         Assert.AreEqual("Já existe um contato com este email.", resultado.Errors.Single().Message);
+        Assert.AreEqual(TipoErro.Conflito, resultado.Errors.Single().Metadata[nameof(TipoErro)]);
         repositorioContato.Verify(r => r.Cadastrar(It.IsAny<Contato>()), Times.Never);
     }
 
@@ -90,6 +92,7 @@ public sealed class ServicoContatoTests
         // Assert
         Assert.IsTrue(resultado.IsFailed);
         Assert.AreEqual("Já existe um contato com este telefone.", resultado.Errors.Single().Message);
+        Assert.AreEqual(TipoErro.Conflito, resultado.Errors.Single().Metadata[nameof(TipoErro)]);
         repositorioContato.Verify(r => r.Cadastrar(It.IsAny<Contato>()), Times.Never);
     }
 
@@ -104,6 +107,7 @@ public sealed class ServicoContatoTests
 
         // Assert
         Assert.IsTrue(resultado.IsFailed);
+        Assert.IsTrue(resultado.Errors.All(e => Equals(TipoErro.Validacao, e.Metadata[nameof(TipoErro)])));
         Assert.IsTrue(resultado.Errors.Any(e => e.Message.Contains("Nome")));
         Assert.IsTrue(resultado.Errors.Any(e =>
             e.Metadata.TryGetValue("Campo", out object? campo) &&
@@ -162,6 +166,7 @@ public sealed class ServicoContatoTests
         // Assert
         Assert.IsTrue(resultado.IsFailed);
         Assert.AreEqual("Contato não encontrado.", resultado.Errors.Single().Message);
+        Assert.AreEqual(TipoErro.NaoEncontrado, resultado.Errors.Single().Metadata[nameof(TipoErro)]);
     }
 
     [TestMethod]
@@ -195,6 +200,7 @@ public sealed class ServicoContatoTests
 
         // Assert
         Assert.IsTrue(resultado.IsFailed);
+        Assert.AreEqual(TipoErro.Conflito, resultado.Errors.Single().Metadata[nameof(TipoErro)]);
         repositorioContato.Verify(r => r.Excluir(It.IsAny<Guid>()), Times.Never);
     }
 

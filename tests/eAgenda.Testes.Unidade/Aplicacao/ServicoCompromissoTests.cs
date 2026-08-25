@@ -1,3 +1,4 @@
+using eAgenda.Aplicacao.Compartilhado;
 using eAgenda.Aplicacao.Modulos.ModuloCompromisso;
 using eAgenda.Dominio.Modulos.ModuloCompromisso;
 using eAgenda.Dominio.Modulos.ModuloContato;
@@ -94,6 +95,8 @@ public sealed class ServicoCompromissoTests
         // Assert
         Assert.IsTrue(resultado.IsFailed);
         Assert.AreEqual("Selecione um contato válido.", resultado.Errors.Single().Message);
+        Assert.AreEqual(TipoErro.Validacao, resultado.Errors.Single().Metadata[nameof(TipoErro)]);
+        Assert.AreEqual(nameof(dto.ContatoId), resultado.Errors.Single().Metadata["Campo"]);
         repositorioCompromisso.Verify(r => r.Cadastrar(It.IsAny<Compromisso>()), Times.Never);
     }
 
@@ -121,6 +124,7 @@ public sealed class ServicoCompromissoTests
         Assert.AreEqual(
             "Já existe um compromisso cadastrado neste intervalo de horário.",
             resultado.Errors.Single().Message);
+        Assert.AreEqual(TipoErro.Conflito, resultado.Errors.Single().Metadata[nameof(TipoErro)]);
         repositorioCompromisso.Verify(r => r.Cadastrar(It.IsAny<Compromisso>()), Times.Never);
     }
 
@@ -213,6 +217,7 @@ public sealed class ServicoCompromissoTests
         // Assert
         Assert.IsTrue(resultado.IsFailed);
         Assert.AreEqual("Compromisso não encontrado.", resultado.Errors.Single().Message);
+        Assert.AreEqual(TipoErro.NaoEncontrado, resultado.Errors.Single().Metadata[nameof(TipoErro)]);
     }
 
     [TestMethod]
@@ -227,6 +232,7 @@ public sealed class ServicoCompromissoTests
         // Assert
         Assert.IsTrue(resultado.IsFailed);
         Assert.AreEqual("Compromisso não encontrado.", resultado.Errors.Single().Message);
+        Assert.AreEqual(TipoErro.NaoEncontrado, resultado.Errors.Single().Metadata[nameof(TipoErro)]);
         repositorioCompromisso.Verify(r => r.Excluir(It.IsAny<Guid>()), Times.Never);
     }
 

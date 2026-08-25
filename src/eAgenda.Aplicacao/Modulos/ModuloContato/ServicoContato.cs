@@ -48,10 +48,10 @@ public class ServicoContato : ServicoBase<Contato>
     public Result Editar(EditarContatoDto dto)
     {
         if (ExisteContatoComMesmoEmail(dto.Email, dto.Id))
-            return Falha(nameof(dto.Email), "Já existe um contato com este email.");
+            return Falha(TipoErro.Conflito, nameof(dto.Email), "Já existe um contato com este email.");
 
         if (ExisteContatoComMesmoTelefone(dto.Telefone, dto.Id))
-            return Falha(nameof(dto.Telefone), "Já existe um contato com este telefone.");
+            return Falha(TipoErro.Conflito, nameof(dto.Telefone), "Já existe um contato com este telefone.");
 
         Contato contatoAtualizado = new Contato(
             dto.Nome,

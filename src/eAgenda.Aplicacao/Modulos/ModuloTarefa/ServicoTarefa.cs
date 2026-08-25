@@ -1,5 +1,4 @@
 using FluentResults;
-using eAgenda.Dominio.Compartilhado;
 using eAgenda.Dominio.Modulos.ModuloTarefa;
 using eAgenda.Aplicacao.Compartilhado;
 
@@ -33,7 +32,7 @@ public class ServicoTarefa : ServicoBase<Tarefa>
         Tarefa? tarefa = repositorioTarefa.SelecionarPorId(dto.Id);
 
         if (tarefa == null)
-            return Falha(string.Empty, "Tarefa não encontrada.");
+            return Falha(TipoErro.NaoEncontrado, string.Empty, "Tarefa não encontrada.");
 
         tarefa.Titulo = dto.Titulo;
         tarefa.Prioridade = dto.Prioridade;
@@ -53,7 +52,7 @@ public class ServicoTarefa : ServicoBase<Tarefa>
         Tarefa? tarefa = repositorioTarefa.SelecionarPorId(id);
 
         if (tarefa == null)
-            return Falha(string.Empty, "Tarefa não encontrada.");
+            return Falha(TipoErro.NaoEncontrado, string.Empty, "Tarefa não encontrada.");
 
         repositorioTarefa.Excluir(id);
 
@@ -65,11 +64,11 @@ public class ServicoTarefa : ServicoBase<Tarefa>
         Tarefa? tarefa = repositorioTarefa.SelecionarPorId(dto.TarefaId);
 
         if (tarefa == null)
-            return Falha(string.Empty, "Tarefa não encontrada.");
+            return Falha(TipoErro.NaoEncontrado, string.Empty, "Tarefa não encontrada.");
 
         ItemTarefa novoItem = new ItemTarefa(dto.Titulo);
 
-        Result resultadoValidacaoItem = ValidarItem(novoItem);
+        Result resultadoValidacaoItem = ValidarEntidade(novoItem);
 
         if (resultadoValidacaoItem.IsFailed)
             return resultadoValidacaoItem;
@@ -91,12 +90,12 @@ public class ServicoTarefa : ServicoBase<Tarefa>
         Tarefa? tarefa = repositorioTarefa.SelecionarPorId(dto.TarefaId);
 
         if (tarefa == null)
-            return Falha(string.Empty, "Tarefa não encontrada.");
+            return Falha(TipoErro.NaoEncontrado, string.Empty, "Tarefa não encontrada.");
 
         bool itemEncontrado = tarefa.AlterarConclusaoItem(dto.ItemId, dto.Concluido);
 
         if (!itemEncontrado)
-            return Falha(string.Empty, "Item de tarefa não encontrado.");
+            return Falha(TipoErro.NaoEncontrado, string.Empty, "Item de tarefa não encontrado.");
 
         repositorioTarefa.Editar(tarefa.Id, tarefa);
 
@@ -108,12 +107,12 @@ public class ServicoTarefa : ServicoBase<Tarefa>
         Tarefa? tarefa = repositorioTarefa.SelecionarPorId(dto.TarefaId);
 
         if (tarefa == null)
-            return Falha(string.Empty, "Tarefa não encontrada.");
+            return Falha(TipoErro.NaoEncontrado, string.Empty, "Tarefa não encontrada.");
 
         bool conseguiuAlterar = tarefa.AlterarConclusaoManual(dto.Concluida);
 
         if (!conseguiuAlterar)
-            return Falha(string.Empty, "A conclusão desta tarefa deve ser controlada pelos itens cadastrados.");
+            return Falha(TipoErro.Conflito, nameof(dto.Concluida), "A conclusão desta tarefa deve ser controlada pelos itens cadastrados.");
 
         repositorioTarefa.Editar(tarefa.Id, tarefa);
 
@@ -125,12 +124,12 @@ public class ServicoTarefa : ServicoBase<Tarefa>
         Tarefa? tarefa = repositorioTarefa.SelecionarPorId(dto.TarefaId);
 
         if (tarefa == null)
-            return Falha(string.Empty, "Tarefa não encontrada.");
+            return Falha(TipoErro.NaoEncontrado, string.Empty, "Tarefa não encontrada.");
 
         bool itemEncontrado = tarefa.RemoverItem(dto.ItemId);
 
         if (!itemEncontrado)
-            return Falha(string.Empty, "Item de tarefa não encontrado.");
+            return Falha(TipoErro.NaoEncontrado, string.Empty, "Item de tarefa não encontrado.");
 
         repositorioTarefa.Editar(tarefa.Id, tarefa);
 
@@ -158,7 +157,7 @@ public class ServicoTarefa : ServicoBase<Tarefa>
         Tarefa? tarefa = repositorioTarefa.SelecionarPorId(id);
 
         if (tarefa == null)
-            return Result.Fail("Tarefa não encontrada.");
+            return Falha<DetalhesTarefaDto>(TipoErro.NaoEncontrado, string.Empty, "Tarefa não encontrada.");
 
         return Result.Ok(new DetalhesTarefaDto(
             tarefa.Id,
@@ -193,15 +192,4 @@ public class ServicoTarefa : ServicoBase<Tarefa>
             .ToList();
     }
 
-    private static Result ValidarItem(ItemTarefa item)
-    {
-        IReadOnlyList<ErroValidacao> erros = item.Validar();
-
-        if (erros.Count == 0)
-            return Result.Ok();
-
-        ErroValidacao primeiroErro = erros.First();
-
-        return Falha(primeiroErro.Campo, primeiroErro.Mensagem);
-    }
 }

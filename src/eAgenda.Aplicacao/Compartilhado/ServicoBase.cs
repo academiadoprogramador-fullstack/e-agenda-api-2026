@@ -12,7 +12,7 @@ public enum TipoErro
 
 public abstract class ServicoBase<T> where T : EntidadeBase<T>
 {
-    protected static Result ValidarEntidade(T entidade)
+    protected static Result ValidarEntidade<TEntidade>(EntidadeBase<TEntidade> entidade)
     {
         IReadOnlyList<ErroValidacao> erros = entidade.Validar();
 
@@ -25,16 +25,6 @@ public abstract class ServicoBase<T> where T : EntidadeBase<T>
             resultado.WithError(CriarErro(TipoErro.Validacao, erro.Campo, erro.Mensagem));
 
         return resultado;
-    }
-
-    protected static Result Falha(string campo, string mensagem)
-    {
-        return Result.Fail(new Error(mensagem).WithMetadata("Campo", campo));
-    }
-
-    protected static Result<TValue> Falha<TValue>(string campo, string mensagem)
-    {
-        return Result.Fail<TValue>(new Error(mensagem).WithMetadata("Campo", campo));
     }
 
     protected static Result Falha(TipoErro tipo, string campo, string mensagem)

@@ -1,3 +1,4 @@
+using eAgenda.Aplicacao.Compartilhado;
 using eAgenda.Aplicacao.Modulos.ModuloCategoria;
 using eAgenda.Dominio.Modulos.ModuloCategoria;
 using eAgenda.Dominio.Modulos.ModuloDespesa;
@@ -50,6 +51,8 @@ public sealed class ServicoCategoriaTests
         // Assert
         Assert.IsTrue(resultado.IsFailed);
         Assert.AreEqual("Já existe uma categoria com este título.", resultado.Errors.Single().Message);
+        Assert.AreEqual(TipoErro.Conflito, resultado.Errors.Single().Metadata[nameof(TipoErro)]);
+        Assert.AreEqual(nameof(dto.Titulo), resultado.Errors.Single().Metadata["Campo"]);
         repositorioCategoria.Verify(r => r.Cadastrar(It.IsAny<Categoria>()), Times.Never);
     }
 
@@ -64,6 +67,7 @@ public sealed class ServicoCategoriaTests
 
         // Assert
         Assert.IsTrue(resultado.IsFailed);
+        Assert.IsTrue(resultado.Errors.All(e => Equals(TipoErro.Validacao, e.Metadata[nameof(TipoErro)])));
         repositorioCategoria.Verify(r => r.Cadastrar(It.IsAny<Categoria>()), Times.Never);
     }
 
@@ -99,6 +103,7 @@ public sealed class ServicoCategoriaTests
         // Assert
         Assert.IsTrue(resultado.IsFailed);
         Assert.AreEqual("Categoria não encontrada.", resultado.Errors.Single().Message);
+        Assert.AreEqual(TipoErro.NaoEncontrado, resultado.Errors.Single().Metadata[nameof(TipoErro)]);
     }
 
     [TestMethod]
@@ -121,6 +126,7 @@ public sealed class ServicoCategoriaTests
 
         // Assert
         Assert.IsTrue(resultado.IsFailed);
+        Assert.AreEqual(TipoErro.Conflito, resultado.Errors.Single().Metadata[nameof(TipoErro)]);
         repositorioCategoria.Verify(r => r.Excluir(It.IsAny<Guid>()), Times.Never);
     }
 

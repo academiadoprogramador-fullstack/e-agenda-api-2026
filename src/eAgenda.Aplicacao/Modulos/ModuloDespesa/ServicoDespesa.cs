@@ -67,7 +67,7 @@ public class ServicoDespesa : ServicoBase<Despesa>
         bool conseguiuEditar = repositorioDespesa.Editar(dto.Id, despesaAtualizada);
 
         if (!conseguiuEditar)
-            return Falha(string.Empty, "Despesa não encontrada.");
+            return Falha(TipoErro.NaoEncontrado, string.Empty, "Despesa não encontrada.");
 
         return Result.Ok();
     }
@@ -77,7 +77,7 @@ public class ServicoDespesa : ServicoBase<Despesa>
         Despesa? despesa = repositorioDespesa.SelecionarPorId(id);
 
         if (despesa == null)
-            return Falha(string.Empty, "Despesa não encontrada.");
+            return Falha(TipoErro.NaoEncontrado, string.Empty, "Despesa não encontrada.");
 
         repositorioDespesa.Excluir(id);
 
@@ -116,7 +116,7 @@ public class ServicoDespesa : ServicoBase<Despesa>
         Despesa? despesa = repositorioDespesa.SelecionarPorId(id);
 
         if (despesa == null)
-            return Result.Fail("Despesa não encontrada.");
+            return Falha<DetalhesDespesaDto>(TipoErro.NaoEncontrado, string.Empty, "Despesa não encontrada.");
 
         return Result.Ok(new DetalhesDespesaDto(
             despesa.Id,
@@ -144,7 +144,7 @@ public class ServicoDespesa : ServicoBase<Despesa>
             .ToList();
 
         if (idsDistintos.Count == 0)
-            return Result.Fail<List<Categoria>>(new Error("Selecione ao menos uma categoria.").WithMetadata("Campo", nameof(CadastrarDespesaDto.CategoriaIds)));
+            return Falha<List<Categoria>>(TipoErro.Validacao, nameof(CadastrarDespesaDto.CategoriaIds), "Selecione ao menos uma categoria.");
 
         List<Categoria> categoriasSelecionadas = repositorioCategoria
             .SelecionarTodos()
@@ -152,7 +152,7 @@ public class ServicoDespesa : ServicoBase<Despesa>
             .ToList();
 
         if (categoriasSelecionadas.Count != idsDistintos.Count)
-            return Result.Fail<List<Categoria>>(new Error("Selecione apenas categorias válidas.").WithMetadata("Campo", nameof(CadastrarDespesaDto.CategoriaIds)));
+            return Falha<List<Categoria>>(TipoErro.Validacao, nameof(CadastrarDespesaDto.CategoriaIds), "Selecione apenas categorias válidas.");
 
         return Result.Ok(categoriasSelecionadas);
     }

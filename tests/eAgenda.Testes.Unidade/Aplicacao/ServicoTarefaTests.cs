@@ -1,3 +1,4 @@
+using eAgenda.Aplicacao.Compartilhado;
 using eAgenda.Aplicacao.Modulos.ModuloTarefa;
 using eAgenda.Dominio.Modulos.ModuloTarefa;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -46,6 +47,7 @@ public sealed class ServicoTarefaTests
 
         // Assert
         Assert.IsTrue(resultado.IsFailed);
+        Assert.IsTrue(resultado.Errors.All(e => Equals(TipoErro.Validacao, e.Metadata[nameof(TipoErro)])));
         repositorioTarefa.Verify(r => r.Cadastrar(It.IsAny<Tarefa>()), Times.Never);
     }
 
@@ -104,6 +106,8 @@ public sealed class ServicoTarefaTests
 
         // Assert
         Assert.IsTrue(resultado.IsFailed);
+        Assert.IsTrue(resultado.Errors.All(e => Equals(TipoErro.Validacao, e.Metadata[nameof(TipoErro)])));
+        Assert.AreEqual(nameof(ItemTarefa.Titulo), resultado.Errors.Single().Metadata["Campo"]);
         Assert.AreEqual(0, tarefa.Itens.Count);
         repositorioTarefa.Verify(r => r.Editar(It.IsAny<Guid>(), It.IsAny<Tarefa>()), Times.Never);
     }
@@ -145,6 +149,8 @@ public sealed class ServicoTarefaTests
 
         // Assert
         Assert.IsTrue(resultado.IsFailed);
+        Assert.AreEqual(TipoErro.Conflito, resultado.Errors.Single().Metadata[nameof(TipoErro)]);
+        Assert.AreEqual(nameof(dto.Concluida), resultado.Errors.Single().Metadata["Campo"]);
         repositorioTarefa.Verify(r => r.Editar(It.IsAny<Guid>(), It.IsAny<Tarefa>()), Times.Never);
     }
 

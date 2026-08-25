@@ -1,3 +1,5 @@
+namespace eAgenda.WebApi.Compartilhado;
+
 public static class ProblemDetailsTypes
 {
     private const string BaseDocumentationUrl = "https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Reference/Status";
