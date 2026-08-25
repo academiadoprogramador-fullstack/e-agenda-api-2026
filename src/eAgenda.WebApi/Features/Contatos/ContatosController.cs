@@ -42,7 +42,29 @@ public sealed class ContatosController(ServicoContato servicoContato) : Controll
         var resultadoCadastro = servicoContato.Cadastrar(dto);
 
         if (resultadoCadastro.IsFailed)
-            return BadRequest();
+        {
+            if (resultadoCadastro.HasError(e =>
+                e.Message.Equals("Já existe um contato com este email.") ||
+                e.Message.Equals("Já existe um contato com este telefone.")
+            )
+            )
+            {
+                return Problem(
+                    statusCode: StatusCodes.Status409Conflict,
+                    detail: resultadoCadastro.Errors.First().Message,
+                    title: "Conflito",
+                    type: "https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Reference/Status/409"
+                );
+            }
+
+            ValidationProblemDetails problemDetails = new()
+            {
+                Status = StatusCodes.Status400BadRequest,
+                Title = "Requisição Inválida"
+            };
+
+            return ValidationProblem(problemDetails);
+        }
 
         var id = resultadoCadastro.Value;
 
