@@ -30,24 +30,24 @@ public class Despesa : EntidadeBase<Despesa>
         Categorias = categorias;
     }
 
-    public override List<string> Validar()
+    public override IReadOnlyList<ErroValidacao> Validar()
     {
-        List<string> erros = [];
+        List<ErroValidacao> erros = [];
 
         if (string.IsNullOrWhiteSpace(Descricao) || Descricao.Length < 2 || Descricao.Length > 100)
-            erros.Add("O campo \"Descrição\" deve conter entre 2 e 100 caracteres.");
+            erros.Add(new(nameof(Descricao), "O campo \"Descrição\" deve conter entre 2 e 100 caracteres."));
 
         if (DataOcorrencia == default)
-            erros.Add("O campo \"Data de Ocorrência\" deve ser preenchido.");
+            erros.Add(new(nameof(DataOcorrencia), "O campo \"Data de Ocorrência\" deve ser preenchido."));
 
         if (Valor <= 0)
-            erros.Add("O campo \"Valor\" deve ser maior que zero.");
+            erros.Add(new(nameof(Valor), "O campo \"Valor\" deve ser maior que zero."));
 
         if (!Enum.IsDefined(FormaPagamento))
-            erros.Add("O campo \"Forma de Pagamento\" deve ser preenchido.");
+            erros.Add(new(nameof(FormaPagamento), "O campo \"Forma de Pagamento\" deve ser preenchido."));
 
         if (Categorias.Count == 0)
-            erros.Add("Selecione ao menos uma categoria.");
+            erros.Add(new(nameof(Categorias), "Selecione ao menos uma categoria."));
 
         return erros;
     }

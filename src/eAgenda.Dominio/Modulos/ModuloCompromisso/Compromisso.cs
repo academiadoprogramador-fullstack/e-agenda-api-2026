@@ -39,39 +39,39 @@ public class Compromisso : EntidadeBase<Compromisso>
         Contato = contato;
     }
 
-    public override List<string> Validar()
+    public override IReadOnlyList<ErroValidacao> Validar()
     {
-        List<string> erros = [];
+        List<ErroValidacao> erros = [];
 
         if (string.IsNullOrWhiteSpace(Assunto) || Assunto.Length < 2 || Assunto.Length > 100)
-            erros.Add("O campo \"Assunto\" deve conter entre 2 e 100 caracteres.");
+            erros.Add(new(nameof(Assunto), "O campo \"Assunto\" deve conter entre 2 e 100 caracteres."));
 
         if (DataOcorrencia == default)
-            erros.Add("O campo \"Data de Ocorrência\" deve ser preenchido.");
+            erros.Add(new(nameof(DataOcorrencia), "O campo \"Data de Ocorrência\" deve ser preenchido."));
 
         if (HoraInicio == default)
-            erros.Add("O campo \"Hora de Início\" deve ser preenchido.");
+            erros.Add(new(nameof(HoraInicio), "O campo \"Hora de Início\" deve ser preenchido."));
 
         if (HoraTermino == default)
-            erros.Add("O campo \"Hora de Término\" deve ser preenchido.");
+            erros.Add(new(nameof(HoraTermino), "O campo \"Hora de Término\" deve ser preenchido."));
 
         if (HoraTermino <= HoraInicio)
-            erros.Add("A hora de término deve ser posterior à hora de início.");
+            erros.Add(new(nameof(HoraTermino), "A hora de término deve ser posterior à hora de início."));
 
         if (!Enum.IsDefined(Tipo))
-            erros.Add("O campo \"Tipo de Compromisso\" deve ser preenchido.");
+            erros.Add(new(nameof(Tipo), "O campo \"Tipo de Compromisso\" deve ser preenchido."));
 
         if (Tipo == TipoCompromisso.Presencial && string.IsNullOrWhiteSpace(Local))
-            erros.Add("O campo \"Local\" deve ser preenchido para compromissos presenciais.");
+            erros.Add(new(nameof(Local), "O campo \"Local\" deve ser preenchido para compromissos presenciais."));
 
         if (Tipo == TipoCompromisso.Remoto && string.IsNullOrWhiteSpace(Link))
-            erros.Add("O campo \"Link\" deve ser preenchido para compromissos remotos.");
+            erros.Add(new(nameof(Link), "O campo \"Link\" deve ser preenchido para compromissos remotos."));
 
         if (!string.IsNullOrWhiteSpace(Local) && Local.Length > 255)
-            erros.Add("O campo \"Local\" deve conter no máximo 255 caracteres.");
+            erros.Add(new(nameof(Local), "O campo \"Local\" deve conter no máximo 255 caracteres."));
 
         if (!string.IsNullOrWhiteSpace(Link) && Link.Length > 500)
-            erros.Add("O campo \"Link\" deve conter no máximo 500 caracteres.");
+            erros.Add(new(nameof(Link), "O campo \"Link\" deve conter no máximo 500 caracteres."));
 
         return erros;
     }

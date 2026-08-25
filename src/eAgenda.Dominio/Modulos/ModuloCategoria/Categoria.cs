@@ -17,12 +17,12 @@ public class Categoria : EntidadeBase<Categoria>
         Titulo = titulo;
     }
 
-    public override List<string> Validar()
+    public override IReadOnlyList<ErroValidacao> Validar()
     {
-        List<string> erros = [];
+        List<ErroValidacao> erros = [];
 
         if (string.IsNullOrWhiteSpace(Titulo) || Titulo.Length < 2 || Titulo.Length > 100)
-            erros.Add("O campo \"Título\" deve conter entre 2 e 100 caracteres.");
+            erros.Add(new(nameof(Titulo), "O campo \"Título\" deve conter entre 2 e 100 caracteres."));
 
         return erros;
     }

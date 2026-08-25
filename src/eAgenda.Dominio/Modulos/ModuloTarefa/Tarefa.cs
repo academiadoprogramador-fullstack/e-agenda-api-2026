@@ -86,18 +86,18 @@ public class Tarefa : EntidadeBase<Tarefa>
         DataConclusao = Concluida ? DataConclusao ?? DateTime.Today : null;
     }
 
-    public override List<string> Validar()
+    public override IReadOnlyList<ErroValidacao> Validar()
     {
-        List<string> erros = [];
+        List<ErroValidacao> erros = [];
 
         if (string.IsNullOrWhiteSpace(Titulo) || Titulo.Length < 2 || Titulo.Length > 100)
-            erros.Add("O campo \"Título\" deve conter entre 2 e 100 caracteres.");
+            erros.Add(new(nameof(Titulo), "O campo \"Título\" deve conter entre 2 e 100 caracteres."));
 
         if (!Enum.IsDefined(Prioridade))
-            erros.Add("O campo \"Prioridade\" deve ser preenchido.");
+            erros.Add(new(nameof(Prioridade), "O campo \"Prioridade\" deve ser preenchido."));
 
         if (DataCriacao == default)
-            erros.Add("O campo \"Data de Criação\" deve ser preenchido.");
+            erros.Add(new(nameof(DataCriacao), "O campo \"Data de Criação\" deve ser preenchido."));
 
         foreach (ItemTarefa item in Itens)
             erros.AddRange(item.Validar());

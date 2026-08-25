@@ -1,3 +1,4 @@
+using eAgenda.Dominio.Compartilhado;
 using eAgenda.Dominio.Modulos.ModuloCompromisso;
 using eAgenda.Dominio.Modulos.ModuloContato;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -14,12 +15,12 @@ public sealed class EntidadeTests
         Contato contato = new("A", "email-invalido", "000", null, null);
 
         // Act
-        List<string> erros = contato.Validar();
+        IReadOnlyList<ErroValidacao> erros = contato.Validar();
 
         // Assert
-        Assert.IsTrue(erros.Any(erro => erro.Contains("Nome")));
-        Assert.IsTrue(erros.Any(erro => erro.Contains("E-mail")));
-        Assert.IsTrue(erros.Any(erro => erro.Contains("Telefone")));
+        Assert.IsTrue(erros.Any(erro => erro.Campo == nameof(Contato.Nome)));
+        Assert.IsTrue(erros.Any(erro => erro.Campo == nameof(Contato.Email)));
+        Assert.IsTrue(erros.Any(erro => erro.Campo == nameof(Contato.Telefone)));
     }
 
     [TestMethod]
@@ -37,9 +38,10 @@ public sealed class EntidadeTests
             null);
 
         // Act
-        List<string> erros = compromisso.Validar();
+        IReadOnlyList<ErroValidacao> erros = compromisso.Validar();
 
         // Assert
-        Assert.IsTrue(erros.Any(erro => erro.Contains("Local")));
+        Assert.IsTrue(erros.Any(erro =>
+            erro.Campo == nameof(Compromisso.Local) && erro.Mensagem.Contains("Local")));
     }
 }

@@ -105,6 +105,15 @@ public sealed class ServicoContatoTests
         // Assert
         Assert.IsTrue(resultado.IsFailed);
         Assert.IsTrue(resultado.Errors.Any(e => e.Message.Contains("Nome")));
+        Assert.IsTrue(resultado.Errors.Any(e =>
+            e.Metadata.TryGetValue("Campo", out object? campo) &&
+            campo?.ToString() == nameof(Contato.Nome)));
+        Assert.IsTrue(resultado.Errors.Any(e =>
+            e.Metadata.TryGetValue("Campo", out object? campo) &&
+            campo?.ToString() == nameof(Contato.Email)));
+        Assert.IsTrue(resultado.Errors.Any(e =>
+            e.Metadata.TryGetValue("Campo", out object? campo) &&
+            campo?.ToString() == nameof(Contato.Telefone)));
         repositorioContato.Verify(r => r.Cadastrar(It.IsAny<Contato>()), Times.Never);
     }
 

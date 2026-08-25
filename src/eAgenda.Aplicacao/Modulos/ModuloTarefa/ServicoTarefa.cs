@@ -1,4 +1,5 @@
 using FluentResults;
+using eAgenda.Dominio.Compartilhado;
 using eAgenda.Dominio.Modulos.ModuloTarefa;
 using eAgenda.Aplicacao.Compartilhado;
 
@@ -194,11 +195,13 @@ public class ServicoTarefa : ServicoBase<Tarefa>
 
     private static Result ValidarItem(ItemTarefa item)
     {
-        List<string> erros = item.Validar();
+        IReadOnlyList<ErroValidacao> erros = item.Validar();
 
         if (erros.Count == 0)
             return Result.Ok();
 
-        return Falha(nameof(AdicionarItemTarefaDto.Titulo), erros.First());
+        ErroValidacao primeiroErro = erros.First();
+
+        return Falha(primeiroErro.Campo, primeiroErro.Mensagem);
     }
 }

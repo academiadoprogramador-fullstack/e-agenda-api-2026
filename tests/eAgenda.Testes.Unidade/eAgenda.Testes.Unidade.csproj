@@ -20,6 +20,7 @@
   <ItemGroup>
     <ProjectReference Include="../../src/eAgenda.Aplicacao/eAgenda.Aplicacao.csproj" />
     <ProjectReference Include="../../src/eAgenda.Dominio/eAgenda.Dominio.csproj" />
+    <ProjectReference Include="../../src/eAgenda.WebApi/eAgenda.WebApi.csproj" />
   </ItemGroup>
 
 </Project>

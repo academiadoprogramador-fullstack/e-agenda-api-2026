@@ -7,15 +7,15 @@ public abstract class ServicoBase<T> where T : EntidadeBase<T>
 {
     protected static Result ValidarEntidade(T entidade)
     {
-        List<string> erros = entidade.Validar();
+        IReadOnlyList<ErroValidacao> erros = entidade.Validar();
 
         if (erros.Count == 0)
             return Result.Ok();
 
         Result resultado = Result.Ok();
 
-        foreach (string erro in erros)
-            resultado.WithError(new Error(erro).WithMetadata("Campo", string.Empty));
+        foreach (ErroValidacao erro in erros)
+            resultado.WithError(new Error(erro.Mensagem).WithMetadata("Campo", erro.Campo));
 
         return resultado;
     }
