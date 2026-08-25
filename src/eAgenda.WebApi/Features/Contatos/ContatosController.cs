@@ -23,7 +23,7 @@ public sealed class ContatosController(ServicoContato servicoContato) : Controll
         var resultadoSelecao = servicoContato.SelecionarPorId(id);
 
         if (resultadoSelecao.IsFailed)
-            return this.ObterValidationProblem(resultadoSelecao);
+            return this.ValidationProblem(resultadoSelecao);
 
         var dto = resultadoSelecao.Value;
 
@@ -44,7 +44,7 @@ public sealed class ContatosController(ServicoContato servicoContato) : Controll
         var resultadoCadastro = servicoContato.Cadastrar(dto);
 
         if (resultadoCadastro.IsFailed)
-            return this.ObterValidationProblem(resultadoCadastro);
+            return this.ValidationProblem(resultadoCadastro);
 
         var id = resultadoCadastro.Value;
 
@@ -75,7 +75,7 @@ public sealed class ContatosController(ServicoContato servicoContato) : Controll
         var resultadoEdicao = servicoContato.Editar(dto);
 
         if (resultadoEdicao.IsFailed)
-            return this.ObterValidationProblem(resultadoEdicao);
+            return this.ValidationProblem(resultadoEdicao);
 
         return NoContent();
     }
@@ -86,7 +86,7 @@ public sealed class ContatosController(ServicoContato servicoContato) : Controll
         var resultadoExclusao = servicoContato.Excluir(id);
 
         if (resultadoExclusao.IsFailed)
-            return NotFound(id);
+            return this.ValidationProblem(resultadoExclusao);
 
         return NoContent();
     }

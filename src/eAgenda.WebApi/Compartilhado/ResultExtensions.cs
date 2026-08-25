@@ -7,46 +7,55 @@ namespace eAgenda.WebApi.Compartilhado;
 
 public static class ResultExtensions
 {
-    public static ActionResult ObterValidationProblem(this ControllerBase controller, ResultBase result)
+    public static ActionResult ValidationProblem(this ControllerBase controller, ResultBase result)
     {
         var tipoErro = (TipoErro)result.Errors.First().Metadata[nameof(TipoErro)];
 
-        if (tipoErro == TipoErro.NaoEncontrado)
+        if (tipoErro.Equals(TipoErro.NaoEncontrado))
         {
             return controller.Problem(
                 statusCode: StatusCodes.Status404NotFound,
                 detail: result.Errors.First().Message,
                 title: "Recurso Não Encontrado",
-                type: "https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Reference/Status/404"
+                type: ProblemDetailsTypes.NotFound
             );
         }
 
-        if (tipoErro == TipoErro.Conflito)
+        if (tipoErro.Equals(TipoErro.Conflito))
         {
             return controller.Problem(
                 statusCode: StatusCodes.Status409Conflict,
                 detail: result.Errors.First().Message,
                 title: "Conflito",
-                type: "https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Reference/Status/409"
+                type: ProblemDetailsTypes.Conflict
             );
         }
 
-        // Erros de Validação
-        var modelState = new ModelStateDictionary();
-
-        foreach (var erro in result.Errors)
+        if (tipoErro.Equals(TipoErro.Validacao))
         {
-            var campo = erro.Metadata["Campo"].ToString()!;
+            var modelState = new ModelStateDictionary();
 
-            modelState.AddModelError(campo, erro.Message);
+            foreach (var erro in result.Errors)
+            {
+                var campo = erro.Metadata["Campo"].ToString()!;
+
+                modelState.AddModelError(campo, erro.Message);
+            }
+
+            ValidationProblemDetails problemDetails = new(modelState)
+            {
+                Status = StatusCodes.Status400BadRequest,
+                Title = "Requisição Inválida",
+                Type = ProblemDetailsTypes.BadRequest
+            };
+
+            return controller.ValidationProblem(problemDetails);
         }
 
-        ValidationProblemDetails problemDetails = new(modelState)
-        {
-            Status = StatusCodes.Status400BadRequest,
-            Title = "Requisição Inválida"
-        };
-
-        return controller.ValidationProblem(problemDetails);
+        return controller.Problem(
+            statusCode: StatusCodes.Status500InternalServerError,
+            title: "Erro Interno do Servidor",
+            type: ProblemDetailsTypes.InternalServerError
+        );
     }
 }
