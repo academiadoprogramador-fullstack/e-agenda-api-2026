@@ -23,7 +23,7 @@ public sealed class ContatosController(ServicoContato servicoContato) : Controll
         var resultadoSelecao = servicoContato.SelecionarPorId(id);
 
         if (resultadoSelecao.IsFailed)
-            return this.ParaErroDaApi(resultadoSelecao);
+            return this.ObterValidationProblem(resultadoSelecao);
 
         var dto = resultadoSelecao.Value;
 
@@ -44,7 +44,7 @@ public sealed class ContatosController(ServicoContato servicoContato) : Controll
         var resultadoCadastro = servicoContato.Cadastrar(dto);
 
         if (resultadoCadastro.IsFailed)
-            return this.ParaErroDaApi(resultadoCadastro);
+            return this.ObterValidationProblem(resultadoCadastro);
 
         var id = resultadoCadastro.Value;
 
@@ -75,7 +75,7 @@ public sealed class ContatosController(ServicoContato servicoContato) : Controll
         var resultadoEdicao = servicoContato.Editar(dto);
 
         if (resultadoEdicao.IsFailed)
-            return this.ParaErroDaApi(resultadoEdicao);
+            return this.ObterValidationProblem(resultadoEdicao);
 
         return NoContent();
     }

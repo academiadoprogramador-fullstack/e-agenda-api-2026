@@ -7,7 +7,7 @@ namespace eAgenda.WebApi.Compartilhado;
 
 public static class ResultExtensions
 {
-    public static ActionResult ParaErroDaApi(this ControllerBase controller, ResultBase result)
+    public static ActionResult ObterValidationProblem(this ControllerBase controller, ResultBase result)
     {
         var tipoErro = (TipoErro)result.Errors.First().Metadata[nameof(TipoErro)];
 
@@ -36,9 +36,9 @@ public static class ResultExtensions
 
         foreach (var erro in result.Errors)
         {
-            var campo = erro.Metadata["Campo"];
+            var campo = erro.Metadata["Campo"].ToString()!;
 
-            modelState.AddModelError(campo.ToString()!, erro.Message);
+            modelState.AddModelError(campo, erro.Message);
         }
 
         ValidationProblemDetails problemDetails = new(modelState)
@@ -47,6 +47,6 @@ public static class ResultExtensions
             Title = "Requisição Inválida"
         };
 
-        return controller.StatusCode(StatusCodes.Status400BadRequest, problemDetails);
+        return controller.ValidationProblem(problemDetails);
     }
 }
