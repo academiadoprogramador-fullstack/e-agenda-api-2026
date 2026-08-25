@@ -1,4 +1,5 @@
 using eAgenda.Aplicacao.Modulos.ModuloContato;
+using eAgenda.WebApi.Compartilhado;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
@@ -11,20 +12,20 @@ public sealed class ContatosController(ServicoContato servicoContato) : Controll
     [HttpGet]
     public ActionResult<List<ListarContatosDto>> SelecionarTodos()
     {
-        var resultado = servicoContato.SelecionarTodos();
+        var resultadoSelecao = servicoContato.SelecionarTodos();
 
-        return Ok(resultado);
+        return Ok(resultadoSelecao);
     }
 
     [HttpGet("{id:guid}")]
     public ActionResult<DetalhesContatoDto> SelecionarPorId(Guid id)
     {
-        var resultado = servicoContato.SelecionarPorId(id);
+        var resultadoSelecao = servicoContato.SelecionarPorId(id);
 
-        if (resultado.IsFailed)
-            return NotFound(id);
+        if (resultadoSelecao.IsFailed)
+            return this.ParaErroDaApi(resultadoSelecao);
 
-        var dto = resultado.Value;
+        var dto = resultadoSelecao.Value;
 
         return Ok(dto);
     }
@@ -43,39 +44,7 @@ public sealed class ContatosController(ServicoContato servicoContato) : Controll
         var resultadoCadastro = servicoContato.Cadastrar(dto);
 
         if (resultadoCadastro.IsFailed)
-        {
-            if (resultadoCadastro.HasError(e =>
-                e.Message.Equals("Já existe um contato com este email.") ||
-                e.Message.Equals("Já existe um contato com este telefone.")
-            )
-            )
-            {
-                return Problem(
-                    statusCode: StatusCodes.Status409Conflict,
-                    detail: resultadoCadastro.Errors.First().Message,
-                    title: "Conflito",
-                    type: "https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Reference/Status/409"
-                );
-            }
-
-            // Erros de Validação
-            var modelState = new ModelStateDictionary();
-
-            foreach (var erro in resultadoCadastro.Errors)
-            {
-                var campo = erro.Metadata["Campo"];
-
-                modelState.AddModelError(campo.ToString()!, erro.Message);
-            }
-
-            ValidationProblemDetails problemDetails = new(modelState)
-            {
-                Status = StatusCodes.Status400BadRequest,
-                Title = "Requisição Inválida"
-            };
-
-            return ValidationProblem(problemDetails);
-        }
+            return this.ParaErroDaApi(resultadoCadastro);
 
         var id = resultadoCadastro.Value;
 
@@ -103,10 +72,10 @@ public sealed class ContatosController(ServicoContato servicoContato) : Controll
             req.Empresa
         );
 
-        var resultado = servicoContato.Editar(dto);
+        var resultadoEdicao = servicoContato.Editar(dto);
 
-        if (resultado.IsFailed)
-            return NotFound(id);
+        if (resultadoEdicao.IsFailed)
+            return this.ParaErroDaApi(resultadoEdicao);
 
         return NoContent();
     }
@@ -114,9 +83,9 @@ public sealed class ContatosController(ServicoContato servicoContato) : Controll
     [HttpDelete("{id:guid}")]
     public ActionResult Excluir(Guid id)
     {
-        var resultado = servicoContato.Excluir(id);
+        var resultadoExclusao = servicoContato.Excluir(id);
 
-        if (resultado.IsFailed)
+        if (resultadoExclusao.IsFailed)
             return NotFound(id);
 
         return NoContent();

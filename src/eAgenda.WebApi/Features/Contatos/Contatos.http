@@ -6,9 +6,9 @@ POST {{baseUrl}}/api/contatos
 Content-Type: application/json
 
 {
-    "nome": "J",
-    "email": "teste-{{$guid}}.net",
-    "telefone": "96799-0000",
+    "nome": "Junior Testes",
+    "email": "teste-{{$guid}}@academiadoprogramador.net",
+    "telefone": "(11) 96799-0000",
     "cargo": "Analista de Testes",
     "empresa": "Academia do Programador"
 }
