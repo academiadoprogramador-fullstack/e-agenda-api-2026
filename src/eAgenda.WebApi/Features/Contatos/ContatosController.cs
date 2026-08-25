@@ -1,5 +1,6 @@
 using eAgenda.Aplicacao.Modulos.ModuloContato;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace eAgenda.WebApi.Features.Contatos;
 
@@ -57,7 +58,17 @@ public sealed class ContatosController(ServicoContato servicoContato) : Controll
                 );
             }
 
-            ValidationProblemDetails problemDetails = new()
+            // Erros de Validação
+            var modelState = new ModelStateDictionary();
+
+            foreach (var erro in resultadoCadastro.Errors)
+            {
+                var campo = erro.Metadata["Campo"];
+
+                modelState.AddModelError(campo.ToString()!, erro.Message);
+            }
+
+            ValidationProblemDetails problemDetails = new(modelState)
             {
                 Status = StatusCodes.Status400BadRequest,
                 Title = "Requisição Inválida"
