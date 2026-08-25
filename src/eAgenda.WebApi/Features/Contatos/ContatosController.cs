@@ -48,7 +48,7 @@ public sealed class ContatosController(ServicoContato servicoContato) : Controll
 
         var resultadoSelecao = servicoContato.SelecionarPorId(id);
 
-        if (resultadoCadastro.IsFailed)
+        if (resultadoSelecao.IsFailed)
             return NotFound(id);
 
         return CreatedAtAction(
