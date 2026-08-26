@@ -1,7 +1,6 @@
 using eAgenda.Aplicacao.Modulos.ModuloContato;
 using eAgenda.WebApi.Compartilhado;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace eAgenda.WebApi.Features.Contatos;
 
