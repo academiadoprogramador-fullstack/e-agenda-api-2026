@@ -11,8 +11,6 @@ public sealed class ContatosController(ServicoContato servicoContato) : Controll
     [HttpGet]
     public ActionResult<List<ListarContatosDto>> SelecionarTodos()
     {
-        throw new NotImplementedException();
-
         var resultadoSelecao = servicoContato.SelecionarTodos();
 
         return Ok(resultadoSelecao);

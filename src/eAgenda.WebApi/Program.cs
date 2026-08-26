@@ -26,6 +26,9 @@ builder.Services.AddProblemDetails(options =>
     };
 });
 
+builder.Services.AddOpenApi();
+builder.Services.AddSwaggerGen();
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -35,10 +38,15 @@ if (app.Environment.IsDevelopment())
     var dbContext = scope.ServiceProvider.GetRequiredService<EAgendaDbContext>();
 
     dbContext.Database.Migrate();
+
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
 
 app.UseExceptionHandler();
 app.UseHttpsRedirection();
+
+app.MapOpenApi();
 app.MapControllers();
 
 app.Run();
