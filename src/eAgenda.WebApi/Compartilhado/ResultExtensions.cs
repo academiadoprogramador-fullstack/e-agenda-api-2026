@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using eAgenda.Aplicacao.Compartilhado;
 using FluentResults;
 using Microsoft.AspNetCore.Mvc;
@@ -7,27 +8,30 @@ namespace eAgenda.WebApi.Compartilhado;
 
 public static class ResultExtensions
 {
-    public static ActionResult ValidationProblem(this ControllerBase controller, ResultBase result)
+    public static ActionResult ProblemDetails(this ControllerBase controller, ResultBase result)
     {
         var tipoErro = (TipoErro)result.Errors.First().Metadata[nameof(TipoErro)];
+        var mensagemErro = result.Errors.First().Message;
 
         if (tipoErro.Equals(TipoErro.NaoEncontrado))
         {
-            return controller.Problem(
-                statusCode: StatusCodes.Status404NotFound,
-                detail: result.Errors.First().Message,
-                title: "Recurso Não Encontrado",
-                type: ProblemDetailsTypes.NotFound
+            return CriarProblem(
+                controller,
+                StatusCodes.Status404NotFound,
+                mensagemErro,
+                "Recurso Não Encontrado",
+                ProblemDetailsTypes.NotFound
             );
         }
 
         if (tipoErro.Equals(TipoErro.Conflito))
         {
-            return controller.Problem(
-                statusCode: StatusCodes.Status409Conflict,
-                detail: result.Errors.First().Message,
-                title: "Conflito",
-                type: ProblemDetailsTypes.Conflict
+            return CriarProblem(
+                controller,
+                StatusCodes.Status409Conflict,
+                mensagemErro,
+                "Conflito",
+                ProblemDetailsTypes.Conflict
             );
         }
 
@@ -49,13 +53,44 @@ public static class ResultExtensions
                 Type = ProblemDetailsTypes.BadRequest
             };
 
+            AdicionarTraceId(problemDetails, controller);
+
             return controller.ValidationProblem(problemDetails);
         }
 
-        return controller.Problem(
-            statusCode: StatusCodes.Status500InternalServerError,
-            title: "Erro Interno do Servidor",
-            type: ProblemDetailsTypes.InternalServerError
+        return CriarProblem(
+            controller,
+            StatusCodes.Status500InternalServerError,
+            null,
+            "Erro do Interno do Servidor",
+            ProblemDetailsTypes.InternalServerError
         );
+    }
+
+    private static ObjectResult CriarProblem(
+        ControllerBase controller,
+        int statusCode,
+        string? detail,
+        string title,
+        string type
+    )
+    {
+        ProblemDetails problemDetails = new()
+        {
+            Status = statusCode,
+            Detail = detail,
+            Title = title,
+            Type = type
+        };
+
+        AdicionarTraceId(problemDetails, controller);
+
+        return controller.StatusCode(statusCode, problemDetails);
+    }
+
+    private static void AdicionarTraceId(ProblemDetails problemDetails, ControllerBase controller)
+    {
+        problemDetails.Extensions["traceId"] =
+            Activity.Current?.Id ?? controller.HttpContext.TraceIdentifier;
     }
 }
