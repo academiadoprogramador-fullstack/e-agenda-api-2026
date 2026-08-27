@@ -1,16 +1,17 @@
 using eAgenda.Aplicacao.Modulos.ModuloContato;
 using eAgenda.WebApi.Compartilhado;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace eAgenda.WebApi.Features.Contatos;
 
 [ApiController]
 [Route("api/contatos")]
-[Authorize]
 public sealed class ContatosController(ServicoContato servicoContato) : ControllerBase
 {
     [HttpGet]
+    [ProducesResponseType<List<ListarContatosDto>>(StatusCodes.Status200OK, "application/json")]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized, "application/problem+json")]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden, "application/problem+json")]
     public ActionResult<List<ListarContatosDto>> SelecionarTodos()
     {
         var resultadoSelecao = servicoContato.SelecionarTodos();
@@ -19,6 +20,10 @@ public sealed class ContatosController(ServicoContato servicoContato) : Controll
     }
 
     [HttpGet("{id:guid}")]
+    [ProducesResponseType<DetalhesContatoDto>(StatusCodes.Status200OK, "application/json")]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized, "application/problem+json")]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden, "application/problem+json")]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound, "application/problem+json")]
     public ActionResult<DetalhesContatoDto> SelecionarPorId(Guid id)
     {
         var resultadoSelecao = servicoContato.SelecionarPorId(id);
@@ -32,6 +37,12 @@ public sealed class ContatosController(ServicoContato servicoContato) : Controll
     }
 
     [HttpPost]
+    [ProducesResponseType<DetalhesContatoDto>(StatusCodes.Status201Created, "application/json")]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest, "application/problem+json")]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized, "application/problem+json")]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden, "application/problem+json")]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound, "application/problem+json")]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status409Conflict, "application/problem+json")]
     public ActionResult<DetalhesContatoDto> Cadastrar(CadastrarContatoRequest req)
     {
         var dto = new CadastrarContatoDto(
@@ -62,6 +73,12 @@ public sealed class ContatosController(ServicoContato servicoContato) : Controll
     }
 
     [HttpPut("{id:guid}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest, "application/problem+json")]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized, "application/problem+json")]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden, "application/problem+json")]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound, "application/problem+json")]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status409Conflict, "application/problem+json")]
     public ActionResult<DetalhesContatoDto> Editar(Guid id, EditarContatoRequest req)
     {
         var dto = new EditarContatoDto(
@@ -82,6 +99,11 @@ public sealed class ContatosController(ServicoContato servicoContato) : Controll
     }
 
     [HttpDelete("{id:guid}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized, "application/problem+json")]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden, "application/problem+json")]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound, "application/problem+json")]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status409Conflict, "application/problem+json")]
     public ActionResult Excluir(Guid id)
     {
         var resultadoExclusao = servicoContato.Excluir(id);

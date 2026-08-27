@@ -9,6 +9,8 @@ using eAgenda.Infra.Compartilhado.Orm;
 using eAgenda.WebApi.Compartilhado;
 using eAgenda.WebApi.Compartilhado.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
@@ -51,12 +53,26 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
     };
 });
 
-builder.Services.AddAuthorization();
-
-builder.Services.AddControllers().AddJsonOptions(options =>
+builder.Services.AddAuthorization(options =>
 {
-    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    options.FallbackPolicy = new AuthorizationPolicyBuilder()
+        .RequireAuthenticatedUser()
+        .Build();
 });
+
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    })
+    .ConfigureApiBehaviorOptions(options =>
+    {
+        options.ClientErrorMapping[StatusCodes.Status400BadRequest].Link = ProblemDetailsTypes.BadRequest;
+        options.ClientErrorMapping[StatusCodes.Status401Unauthorized].Link = ProblemDetailsTypes.Unauthorized;
+        options.ClientErrorMapping[StatusCodes.Status403Forbidden].Link = ProblemDetailsTypes.Forbidden;
+        options.ClientErrorMapping[StatusCodes.Status404NotFound].Link = ProblemDetailsTypes.NotFound;
+        options.ClientErrorMapping[StatusCodes.Status409Conflict].Link = ProblemDetailsTypes.Conflict;
+    });
 
 builder.Services.AddProblemDetails(options =>
 {
@@ -66,6 +82,17 @@ builder.Services.AddProblemDetails(options =>
 
         if (type is not null)
             context.ProblemDetails.Type = type;
+
+        if (context.ProblemDetails.Status == StatusCodes.Status401Unauthorized)
+        {
+            context.ProblemDetails.Title = "Não Autenticado";
+            context.ProblemDetails.Detail = "É necessário fornecer credenciais válidas.";
+        }
+        else if (context.ProblemDetails.Status == StatusCodes.Status403Forbidden)
+        {
+            context.ProblemDetails.Title = "Acesso Negado";
+            context.ProblemDetails.Detail = "O usuário autenticado não tem permissão para acessar este recurso.";
+        }
 
         context.ProblemDetails.Extensions["traceId"] =
             Activity.Current?.Id ?? context.HttpContext.TraceIdentifier;
@@ -106,6 +133,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseExceptionHandler();
+app.UseStatusCodePages();
 app.UseHttpsRedirection();
 
 app.UseAuthentication();

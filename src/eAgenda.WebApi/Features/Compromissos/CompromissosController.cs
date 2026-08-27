@@ -1,22 +1,26 @@
 using eAgenda.Aplicacao.Modulos.ModuloCompromisso;
 using eAgenda.WebApi.Compartilhado;
 using eAgenda.WebApi.Features.Compromissos;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
 [Route("api/compromissos")]
-[Authorize]
 public sealed class CompromissosController(ServicoCompromisso servico) : ControllerBase
 {
-    // Ação / Rota / Endpoint
     [HttpGet]
+    [ProducesResponseType<List<ListarCompromissosDto>>(StatusCodes.Status200OK, "application/json")]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized, "application/problem+json")]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden, "application/problem+json")]
     public ActionResult<List<ListarCompromissosDto>> SelecionarTodos()
     {
         return Ok(servico.SelecionarTodos());
     }
 
     [HttpGet("{id:guid}")]
+    [ProducesResponseType<DetalhesCompromissoDto>(StatusCodes.Status200OK, "application/json")]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized, "application/problem+json")]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden, "application/problem+json")]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound, "application/problem+json")]
     public ActionResult<DetalhesCompromissoDto> SelecionarPorId(Guid id)
     {
         var resultadoSelecao = servico.SelecionarPorId(id);
@@ -28,10 +32,12 @@ public sealed class CompromissosController(ServicoCompromisso servico) : Control
     }
 
     [HttpPost]
-    [ProducesResponseType<DetalhesCompromissoDto>(StatusCodes.Status201Created)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    [ProducesResponseType<DetalhesCompromissoDto>(StatusCodes.Status201Created, "application/json")]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest, "application/problem+json")]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized, "application/problem+json")]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden, "application/problem+json")]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound, "application/problem+json")]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status409Conflict, "application/problem+json")]
     public ActionResult<DetalhesCompromissoDto> Cadastrar(CadastrarCompromissoRequest request)
     {
         var dto = new CadastrarCompromissoDto(
@@ -66,9 +72,11 @@ public sealed class CompromissosController(ServicoCompromisso servico) : Control
 
     [HttpPut("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest, "application/problem+json")]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized, "application/problem+json")]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden, "application/problem+json")]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound, "application/problem+json")]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status409Conflict, "application/problem+json")]
     public ActionResult Editar(Guid id, EditarCompromissoRequest request)
     {
         var dto = new EditarCompromissoDto(
@@ -93,7 +101,9 @@ public sealed class CompromissosController(ServicoCompromisso servico) : Control
 
     [HttpDelete("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized, "application/problem+json")]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden, "application/problem+json")]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound, "application/problem+json")]
     public ActionResult Excluir(Guid id)
     {
         var resultadoExclusao = servico.Excluir(id);

@@ -1,5 +1,4 @@
 using eAgenda.WebApi.Compartilhado.Identity;
-using FluentResults;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -16,7 +15,8 @@ public sealed class AuthController(
 ) : ControllerBase
 {
     [HttpPost("registrar")]
-    [ProducesResponseType<UsuarioResponse>(StatusCodes.Status201Created)]
+    [ProducesResponseType<UsuarioResponse>(StatusCodes.Status201Created, "application/json")]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest, "application/problem+json")]
     public async Task<ActionResult<UsuarioResponse>> Registrar(RegistrarRequest request)
     {
         var usuario = new IdentityUser<Guid>()
@@ -40,6 +40,8 @@ public sealed class AuthController(
     }
 
     [HttpPost("entrar")]
+    [ProducesResponseType<AccessTokenResponse>(StatusCodes.Status201Created, "application/json")]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized, "application/problem+json")]
     public async Task<ActionResult<AccessTokenResponse>> Entrar(EntrarRequest request)
     {
         var usuario = await userManager.FindByEmailAsync(request.Email.Trim());
