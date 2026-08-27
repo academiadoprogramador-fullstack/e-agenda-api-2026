@@ -1,10 +1,12 @@
 using eAgenda.Dominio.Compartilhado;
+using eAgenda.Dominio.Compartilhado.Identity;
 using eAgenda.Dominio.Modulos.ModuloDespesa;
 
 namespace eAgenda.Dominio.Modulos.ModuloCategoria;
 
-public class Categoria : EntidadeBase<Categoria>
+public class Categoria : EntidadeBase<Categoria>, IEntidadeDeUsuario
 {
+    public Guid UsuarioId { get; set; }
     public string Titulo { get; set; } = string.Empty;
     public List<Despesa> Despesas { get; set; } = new List<Despesa>();
 

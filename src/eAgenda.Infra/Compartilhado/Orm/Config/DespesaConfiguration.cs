@@ -13,6 +13,9 @@ public sealed class DespesaConfiguration : IEntityTypeConfiguration<Despesa>
         builder.HasKey(d => d.Id)
             .HasName("PK_TBDespesa");
 
+        builder.Property(c => c.UsuarioId)
+            .IsRequired();
+
         builder.Property(d => d.Id)
             .ValueGeneratedNever();
 

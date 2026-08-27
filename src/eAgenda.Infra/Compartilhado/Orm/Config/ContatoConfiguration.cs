@@ -13,6 +13,9 @@ public sealed class ContatoConfiguration : IEntityTypeConfiguration<Contato>
         builder.HasKey(c => c.Id)
             .HasName("PK_TBContato");
 
+        builder.Property(c => c.UsuarioId)
+            .IsRequired();
+
         builder.Property(c => c.Id)
             .ValueGeneratedNever();
 
@@ -35,11 +38,11 @@ public sealed class ContatoConfiguration : IEntityTypeConfiguration<Contato>
             .HasMaxLength(100);
 
         // Índice de exclusividade
-        builder.HasIndex(c => c.Email)
+        builder.HasIndex(c => new { c.UsuarioId, c.Email })
             .IsUnique()
             .HasDatabaseName("UQ_TBContato_Email");
 
-        builder.HasIndex(c => c.Telefone)
+        builder.HasIndex(c => new { c.UsuarioId, c.Telefone })
             .IsUnique()
             .HasDatabaseName("UQ_TBContato_Telefone");
     }

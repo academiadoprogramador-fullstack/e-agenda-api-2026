@@ -13,6 +13,9 @@ public sealed class CompromissoConfiguration : IEntityTypeConfiguration<Compromi
         builder.HasKey(c => c.Id)
             .HasName("PK_TBCompromisso");
 
+        builder.Property(c => c.UsuarioId)
+            .IsRequired();
+
         builder.Property(c => c.Id)
             .ValueGeneratedNever();
 

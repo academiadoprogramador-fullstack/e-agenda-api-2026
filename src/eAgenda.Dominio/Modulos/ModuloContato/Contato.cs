@@ -1,10 +1,12 @@
 using System.Text.RegularExpressions;
 using eAgenda.Dominio.Compartilhado;
+using eAgenda.Dominio.Compartilhado.Identity;
 
 namespace eAgenda.Dominio.Modulos.ModuloContato;
 
-public class Contato : EntidadeBase<Contato>
+public class Contato : EntidadeBase<Contato>, IEntidadeDeUsuario
 {
+    public Guid UsuarioId { get; set; }
     public string Nome { get; set; } = string.Empty;
     public string Email { get; set; } = string.Empty;
     public string Telefone { get; set; } = string.Empty;

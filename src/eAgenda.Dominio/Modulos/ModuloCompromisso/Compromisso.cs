@@ -1,10 +1,12 @@
 using eAgenda.Dominio.Compartilhado;
+using eAgenda.Dominio.Compartilhado.Identity;
 using eAgenda.Dominio.Modulos.ModuloContato;
 
 namespace eAgenda.Dominio.Modulos.ModuloCompromisso;
 
-public class Compromisso : EntidadeBase<Compromisso>
+public class Compromisso : EntidadeBase<Compromisso>, IEntidadeDeUsuario
 {
+    public Guid UsuarioId { get; set; }
     public string Assunto { get; set; } = string.Empty;
     public DateTime DataOcorrencia { get; set; } = DateTime.Today;
     public TimeSpan HoraInicio { get; set; }

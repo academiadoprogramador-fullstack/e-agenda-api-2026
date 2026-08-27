@@ -1,10 +1,12 @@
 using eAgenda.Dominio.Compartilhado;
+using eAgenda.Dominio.Compartilhado.Identity;
 using eAgenda.Dominio.Modulos.ModuloCategoria;
 
 namespace eAgenda.Dominio.Modulos.ModuloDespesa;
 
-public class Despesa : EntidadeBase<Despesa>
+public class Despesa : EntidadeBase<Despesa>, IEntidadeDeUsuario
 {
+    public Guid UsuarioId { get; set; }
     public string Descricao { get; set; } = string.Empty;
     public DateTime DataOcorrencia { get; set; } = DateTime.Today;
     public decimal Valor { get; set; }
