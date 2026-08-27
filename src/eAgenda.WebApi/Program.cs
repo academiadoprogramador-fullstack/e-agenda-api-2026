@@ -25,7 +25,6 @@ builder.Services.AddProblemDetails(options =>
         if (type is not null)
             context.ProblemDetails.Type = type;
 
-        // TraceId
         context.ProblemDetails.Extensions["traceId"] =
             Activity.Current?.Id ?? context.HttpContext.TraceIdentifier;
     };
