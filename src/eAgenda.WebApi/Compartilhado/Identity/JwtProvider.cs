@@ -16,9 +16,7 @@ public sealed class JwtProvider(JwtOptions options)
         DateTime dataExpiracao = dataCriacao.AddMinutes(options.AccessTokenMinutes);
 
         List<Claim> claims = [
-            new(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
             new(ClaimTypes.NameIdentifier, user.Id.ToString()),
-            new(ClaimTypes.Name, user.UserName ?? user.Email ?? user.Id.ToString()),
             new(ClaimTypes.Email, user.Email ?? string.Empty),
         ];
 
