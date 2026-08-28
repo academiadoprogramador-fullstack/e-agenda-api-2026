@@ -3,7 +3,6 @@ using eAgenda.Dominio.Modulos.ModuloCompromisso;
 using eAgenda.Dominio.Modulos.ModuloContato;
 using eAgenda.Dominio.Modulos.ModuloDespesa;
 using eAgenda.Dominio.Modulos.ModuloTarefa;
-using eAgenda.Infra.Compartilhado.Logging;
 using eAgenda.Infra.Compartilhado.Orm;
 using eAgenda.Infra.Modulos.ModuloCategoria;
 using eAgenda.Infra.Modulos.ModuloCompromisso;
@@ -14,20 +13,16 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 
 namespace eAgenda.Infra;
 
-public static class InjecaoDependencia
+public static class DependencyInjection
 {
-    public static void AddInfraRepositories(
+    public static void AddInfrastructureServices(
         this IServiceCollection services,
-        IConfiguration configuration,
-        ILoggingBuilder logging
+        IConfiguration configuration
     )
     {
-        services.AddSerilogLogger(configuration, logging);
-
         services.AddDataProtection();
 
         services.AddIdentityCore<IdentityUser<Guid>>(options =>

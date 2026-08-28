@@ -1,5 +1,5 @@
 using eAgenda.Dominio.Compartilhado;
-using eAgenda.Dominio.Compartilhado.Identity;
+using eAgenda.Dominio.Compartilhado.Auth;
 using eAgenda.Dominio.Modulos.ModuloContato;
 
 namespace eAgenda.Dominio.Modulos.ModuloCompromisso;

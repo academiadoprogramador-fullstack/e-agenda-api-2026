@@ -1,4 +1,4 @@
-namespace eAgenda.Dominio.Compartilhado.Identity;
+namespace eAgenda.Dominio.Compartilhado.Auth;
 
 public interface IEntidadeDeUsuario
 {

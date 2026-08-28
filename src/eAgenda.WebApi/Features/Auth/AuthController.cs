@@ -1,7 +1,7 @@
-using eAgenda.WebApi.Compartilhado.Identity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using eAgenda.WebApi.Compartilhado.Auth;
 
 namespace eAgenda.WebApi.Features.Auth;
 

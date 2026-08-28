@@ -1,4 +1,4 @@
-using eAgenda.Dominio.Compartilhado.Identity;
+using eAgenda.Dominio.Compartilhado.Auth;
 using eAgenda.Dominio.Modulos.ModuloCategoria;
 using eAgenda.Dominio.Modulos.ModuloCompromisso;
 using eAgenda.Dominio.Modulos.ModuloContato;

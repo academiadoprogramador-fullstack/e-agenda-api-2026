@@ -1,13 +1,28 @@
 using Serilog;
 using Serilog.Core;
 using Serilog.Events;
-using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 
-namespace eAgenda.Infra.Compartilhado.Logging;
+namespace eAgenda.WebApi.Compartilhado.Logging;
 
-public static class SerilogFactory
+public static class LoggingExtensions
 {
-    public static Logger Create(IConfiguration configuration)
+    public static void AddSerilogServices(
+        this IServiceCollection services,
+        ILoggingBuilder logging
+    )
+    {
+        using ServiceProvider sp = services.BuildServiceProvider();
+        IOptions<NewRelicOptions> options = sp.GetRequiredService<IOptions<NewRelicOptions>>();
+
+        Serilog.ILogger logger = CriarLogger(options.Value);
+
+        // Remove o provedor padrão de logs da Microsoft e adiciona Serilog
+        logging.ClearProviders();
+        services.AddSerilog(logger);
+    }
+
+    public static Logger CriarLogger(NewRelicOptions newRelicOptions)
     {
         string caminhoAppData = Environment
             .GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
@@ -28,10 +43,6 @@ public static class SerilogFactory
                 rollingInterval: RollingInterval.Day,
                 restrictedToMinimumLevel: LogEventLevel.Error
             );
-
-        NewRelicOptions newRelicOptions = configuration
-            .GetSection(NewRelicOptions.SectionName)
-            .Get<NewRelicOptions>() ?? new NewRelicOptions();
 
         if (newRelicOptions.Enabled)
         {

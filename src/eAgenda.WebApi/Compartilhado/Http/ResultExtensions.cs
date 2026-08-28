@@ -4,7 +4,7 @@ using FluentResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
-namespace eAgenda.WebApi.Compartilhado;
+namespace eAgenda.WebApi.Compartilhado.Http;
 
 public static class ResultExtensions
 {

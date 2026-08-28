@@ -1,6 +1,6 @@
 using System.Text.RegularExpressions;
 using eAgenda.Dominio.Compartilhado;
-using eAgenda.Dominio.Compartilhado.Identity;
+using eAgenda.Dominio.Compartilhado.Auth;
 
 namespace eAgenda.Dominio.Modulos.ModuloContato;
 

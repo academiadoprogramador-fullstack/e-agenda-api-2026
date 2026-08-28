@@ -1,5 +1,5 @@
 using eAgenda.Aplicacao.Modulos.ModuloCompromisso;
-using eAgenda.WebApi.Compartilhado;
+using eAgenda.WebApi.Compartilhado.Http;
 using eAgenda.WebApi.Features.Compromissos;
 using Microsoft.AspNetCore.Mvc;
 

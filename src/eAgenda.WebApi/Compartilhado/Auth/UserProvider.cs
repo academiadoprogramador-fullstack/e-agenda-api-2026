@@ -1,7 +1,7 @@
 using System.Security.Claims;
-using eAgenda.Dominio.Compartilhado.Identity;
+using eAgenda.Dominio.Compartilhado.Auth;
 
-namespace eAgenda.WebApi.Compartilhado.Identity;
+namespace eAgenda.WebApi.Compartilhado.Auth;
 
 public sealed class UserProvider(IHttpContextAccessor httpContextAccessor) : IProvedorDeUsuario
 {

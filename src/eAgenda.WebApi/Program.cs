@@ -1,64 +1,44 @@
 using System.Diagnostics;
-using System.Security.Claims;
-using System.Text;
 using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using Microsoft.OpenApi;
 using eAgenda.Aplicacao;
-using eAgenda.Dominio.Compartilhado.Identity;
 using eAgenda.Infra;
 using eAgenda.Infra.Compartilhado.Orm;
-using eAgenda.WebApi.Compartilhado;
-using eAgenda.WebApi.Compartilhado.Identity;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi;
+using eAgenda.WebApi.Compartilhado.Auth;
+using eAgenda.WebApi.Compartilhado.Http;
+using eAgenda.WebApi.Compartilhado.Logging;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddInfraRepositories(builder.Configuration, builder.Logging);
+// Configuração de opções de serviços
+builder.Services
+    .AddOptions<NewRelicOptions>()
+    .BindConfiguration(NewRelicOptions.SectionName)
+    .Validate(o => !string.IsNullOrWhiteSpace(o.EndpointUrl))
+    .Validate(o => !string.IsNullOrWhiteSpace(o.ApplicationName))
+    .Validate(o => !string.IsNullOrWhiteSpace(o.LicenseKey))
+    .ValidateOnStart();
+
+builder.Services
+    .AddOptions<JwtOptions>()
+    .BindConfiguration(JwtOptions.SectionName)
+    .Validate(o => !string.IsNullOrWhiteSpace(o.Issuer))
+    .Validate(o => !string.IsNullOrWhiteSpace(o.Audience))
+    .Validate(o => !string.IsNullOrWhiteSpace(o.Key))
+    .ValidateOnStart();
+
+builder.Services
+    .AddOptions<JwtBearerOptions>(JwtBearerDefaults.AuthenticationScheme)
+    .Configure<IOptions<JwtOptions>>(JwtExtensions.ConfigureJwtBearerValidation);
+
+// Configuração de serviços
+builder.Services.AddInfrastructureServices(builder.Configuration);
 builder.Services.AddApplicationServices();
-
-builder.Services.AddHttpContextAccessor();
-builder.Services.AddScoped<IProvedorDeUsuario, UserProvider>();
-
-builder.Services.AddSingleton(provider =>
-{
-    var jwtOptions = builder.Configuration.GetSection(JwtOptions.SectionName)
-        .Get<JwtOptions>() ?? new JwtOptions();
-
-    return new JwtProvider(jwtOptions);
-});
-
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
-{
-    var jwtOptions = builder.Configuration.GetSection(JwtOptions.SectionName)
-        .Get<JwtOptions>() ?? new JwtOptions();
-
-    options.TokenValidationParameters = new TokenValidationParameters
-    {
-        ValidateIssuer = true,
-        ValidIssuer = jwtOptions.Issuer,
-
-        ValidateAudience = true,
-        ValidAudience = jwtOptions.Audience,
-
-        ValidateLifetime = true,
-        ValidateIssuerSigningKey = true,
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.Key)), // Chave Mestra
-
-        NameClaimType = ClaimTypes.NameIdentifier,
-        ClockSkew = TimeSpan.FromSeconds(30)
-    };
-});
-
-builder.Services.AddAuthorization(options =>
-{
-    options.FallbackPolicy = new AuthorizationPolicyBuilder()
-        .RequireAuthenticatedUser()
-        .Build();
-});
+builder.Services.AddJwtAuthServices();
+builder.Services.AddSerilogServices(builder.Logging);
 
 builder.Services.AddControllers()
     .AddJsonOptions(options =>

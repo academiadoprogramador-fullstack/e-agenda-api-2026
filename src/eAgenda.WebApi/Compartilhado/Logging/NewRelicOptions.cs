@@ -1,8 +1,8 @@
-namespace eAgenda.Infra.Compartilhado.Logging;
+namespace eAgenda.WebApi.Compartilhado.Logging;
 
 public sealed class NewRelicOptions
 {
-    public const string SectionName = "Infra:NewRelic";
+    public const string SectionName = "NewRelic";
 
     public bool Enabled { get; set; }
     public string EndpointUrl { get; set; } = string.Empty;

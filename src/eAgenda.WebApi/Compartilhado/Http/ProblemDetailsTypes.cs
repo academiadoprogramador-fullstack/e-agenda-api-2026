@@ -1,4 +1,4 @@
-namespace eAgenda.WebApi.Compartilhado;
+namespace eAgenda.WebApi.Compartilhado.Http;
 
 public static class ProblemDetailsTypes
 {
